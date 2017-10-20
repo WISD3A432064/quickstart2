@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
@@ -13,10 +15,15 @@ class TaskController extends Controller
         $this->middleware('auth');
     }
 
-    //回傳視圖
-    public function index(Request $request)
+    //顯示已建立任務
+    public function index()
     {
-        return view('tasks.index');
+        $tasks = Task::where('user_id', Auth::id())->get();
+
+        //dd($tasks);
+        return view('tasks.index', [
+            'tasks' => $tasks,
+        ]);
     }
 
     public function store(Request $request)
@@ -26,12 +33,15 @@ class TaskController extends Controller
             'name' => 'required|max:255',
         ]);
 
+
         $request->user()->tasks()->create([
-        'name' => $request->name,
+            'name' => $request->name,
         ]);
 
         return redirect('/tasks');
     }
+
+
 
 
 }
